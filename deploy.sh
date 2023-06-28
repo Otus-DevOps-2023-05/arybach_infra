@@ -24,3 +24,12 @@ puma -d
 
 ### Check if the app is running
 ps aux | grep puma
+
+### Expose port 9292 with TCP protocol
+yc firewall rule create \
+ --name reddit-app-9292 \
+ --network-name default \
+ --direction ingress \
+ --source-range 0.0.0.0/0 \
+ --destination-port 9292 \
+ --protocol tcp
