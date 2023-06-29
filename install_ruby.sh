@@ -1,4 +1,10 @@
 #!/bin/bash
 
+# Update system packages
 sudo apt update
-sudo apt install -y ruby-full ruby-bundler build-essential
+
+# Install Ruby and Bundler
+sudo apt install -y ruby-full build-essential
+
+# Install or update Bundler
+gem install bundler
