@@ -1,4 +1,4 @@
-testapp_IP = 158.160.33.214
+testapp_IP = 51.250.91.183
 testapp_port = 9292
 
 ### to launch an app
