@@ -1,5 +1,5 @@
 {
-    "service_account_key_file": "~/.ssh/yc_key.json",
+    "service_account_key_file": "/home/groot/.ssh/yc_key.json",
     "folder_id": "replace_with_folder_id",
     "subnet_id": "replace_with_subnet_id",
     "zone": "replace_with_zone_name",
