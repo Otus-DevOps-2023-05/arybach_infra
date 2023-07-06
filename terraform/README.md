@@ -201,3 +201,37 @@ reddit_target_group_id = enpn504b190ph13po2rq
 @ 51.250.3.124:9292
 
 ### firewall rules can be used to limit access to load balancer exclusively
+
+### added output of the test run, that fails in github - not sure how to fix this:
+cd terraform && terraform init && terraform validate -var-file=terraform.tfvars.example
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Using previously-installed yandex-cloud/yandex v0.93.0
+- Using previously-installed hashicorp/null v3.2.1
+
+The following providers do not have any version constraints in configuration,
+so the latest version was installed.
+
+To prevent automatic upgrades to new major versions that may contain breaking
+changes, we recommend adding version constraints in a required_providers block
+in your configuration, with the constraint strings suggested below.
+
+* hashicorp/null: version = "~> 3.2.1"
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+
+Warning: The -var and -var-file flags are not used in validate. Setting them has no effect.
+
+These flags will be removed in a future version of Terraform.
+
+Success! The configuration is valid, but there were some validation warnings as shown above.
