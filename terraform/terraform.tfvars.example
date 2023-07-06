@@ -1,10 +1,10 @@
-service_account_key_file = "/home/user/.ssh/yc_key.json"
+service_account_key_file = "/home/groot/.ssh/yc_key.json"
 cloud_id                 = "b1gxx6b0a78vi3gg0v07"
 folder_id                = "b1gxxagjev1g87f75vkt"
 image_id                 = "fdnxx38qub985a0fsc9s"
 subnet_id                = "e9bqxx2kdhg3sc4os6ci"
 zone                     = "ru-central1-a"
-public_key_path          = "/home/user/.ssh/yc.pub"
-private_key_path         = "/home/user/.ssh/yc"
+public_key_path          = "/home/groot/.ssh/yc.pub"
+private_key_path         = "/home/groot/.ssh/yc"
 yc_token                 = "y0_AATuwQXXXXDmTXb90HfZ51fS_AgXXXXBu28ni-iSccpo03gurBQtzeE"
 app_count                = 1
