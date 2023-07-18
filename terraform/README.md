@@ -309,6 +309,8 @@ export YC_TOKEN="xxxxxxxxxxxxxxxxxxxxxxxxx"
 add storage.admin role to service account in YC cloud console
 
 ### several attempts to generate new YC_ACCESS key and secret have failed with yandex-style nonsense error messages
+export YC_ACCESS_KEY_ID='xxxxxxxxxxxxxxxx'
+export YC_SECRET_ACCESS_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxx'
 
 terraform init
 
