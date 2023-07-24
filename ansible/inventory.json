@@ -1,0 +1,16 @@
+{
+    "app": {
+        "hosts": ["appserver"],
+        "vars": {
+            "ansible_user": "ubuntu",
+            "ansible_private_key_file": "/home/groot/.ssh/tumblebuns"
+        }
+    },
+    "db": {
+        "hosts": ["dbserver"],
+        "vars": {
+            "ansible_user": "ubuntu",
+            "ansible_private_key_file": "/home/groot/.ssh/tumblebuns"
+        }
+    }
+}
