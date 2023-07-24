@@ -235,3 +235,88 @@ Warning: The -var and -var-file flags are not used in validate. Setting them has
 These flags will be removed in a future version of Terraform.
 
 Success! The configuration is valid, but there were some validation warnings as shown above.
+
+### terraform-2
+cd packer
+packer validate -var-file=variables.json.example app.json
+packer validate -var-file=variables.json.example db.json
+
+packer build -var-file=variables.json app.json
+....
+Build 'yandex' finished after 3 minutes 26 seconds.
+
+==> Wait completed after 3 minutes 26 seconds
+
+==> Builds finished. The artifacts of successful builds are:
+--> yandex: A disk image was created: reddit-app-base (id: fd8hbvfs0pc0n8ornjne) with family name reddit-app-base
+
+packer build -var-file=variables.json db.json
+....
+Build 'yandex' finished after 3 minutes 30 seconds.
+
+==> Wait completed after 3 minutes 30 seconds
+
+==> Builds finished. The artifacts of successful builds are:
+--> yandex: A disk image was created: reddit-db-base (id: fd8ibu5rd9iog5qp8fcb) with family name reddit-db-base
+
+add:
+fd8hbvfs0pc0n8ornjne
+and
+fd8ibu5rd9iog5qp8fcb
+
+to terraform.tfvars
+
+### Adding modules
+
+[0] % terraform get
+- app in modules/app
+- db in modules/db
+
+[0] % tree .terraform
+.terraform
+├── modules
+│   └── modules.json
+├── plugins
+│   ├── registry.terraform.io
+│   │   ├── hashicorp
+│   │   │   └── null
+│   │   │       └── 3.2.1
+│   │   │           └── linux_amd64
+│   │   │               └── terraform-provider-null_v3.2.1_x5
+│   │   └── yandex-cloud
+│   │       └── yandex
+│   │           └── 0.93.0
+│   │               └── linux_amd64
+│   │                   ├── CHANGELOG.md
+│   │                   ├── LICENSE
+│   │                   ├── README.md
+│   │                   └── terraform-provider-yandex_v0.93.0
+│   └── selections.json
+└── providers
+    └── registry.terraform.io
+        └── yandex-cloud
+            └── yandex
+                └── 0.95.0
+                    └── linux_amd64
+                        ├── CHANGELOG.md
+                        ├── LICENSE
+                        ├── README.md
+                        └── terraform-provider-yandex_v0.95.0
+
+17 directories, 11 files
+
+export YC_TOKEN="xxxxxxxxxxxxxxxxxxxxxxxxx"
+add storage.admin role to service account in YC cloud console
+
+### several attempts to generate new YC_ACCESS key and secret have failed with yandex-style nonsense error messages
+export YC_ACCESS_KEY_ID='xxxxxxxxxxxxxxxx'
+export YC_SECRET_ACCESS_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+terraform init
+
+Initializing the backend...
+
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.
+Error refreshing state: SignatureDoesNotMatch: The request signature we calculated does not match the signature you provided. Check your key and signing method.
+        status code: 403, request id: 0022a56cd6b59eeb, host id:
