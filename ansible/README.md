@@ -506,3 +506,5 @@ and in ansible.cfg:
 inventory = ./dynamic.py
 
 Dynamic inventories are generated dynamically at runtime using executable scripts, static are hardcoded from the start.
+
+'''Modifed terraform-2 repo to address test failures in ansible-1 branch
