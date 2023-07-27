@@ -1,0 +1,13 @@
+app:
+  hosts:
+    appserver:
+      ansible_host: 158.160.106.176
+      # ansible_user: ubuntu
+      # ansible_private_key_file: ~/.ssh/tumblebuns
+
+db:
+  hosts:
+    dbserver:
+      ansible_host: 158.160.113.21
+      # ansible_user: ubuntu
+      # ansible_private_key_file: ~/.ssh/tumblebuns
