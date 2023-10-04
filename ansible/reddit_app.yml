@@ -1,0 +1,137 @@
+---
+- name: Configure hosts & deploy application
+  hosts: appserver
+  vars:
+    mongo_bind_ip: 0.0.0.0
+    db_host: 10.128.0.20
+  tasks:
+    - name: Install git
+      ansible.builtin.apt:
+        name: git
+        state: present
+      become: yes
+      tags: deploy-tag
+
+    - name: Install Ruby and RubyGems
+      ansible.builtin.apt:
+        name:
+          - ruby-full
+          - ruby-bundler
+          - build-essential
+        state: present
+      tags: deploy-tag
+      become: yes
+
+    - name: Install specified Bundler version
+      command: gem install bundler:1.17.2
+      tags: deploy-tag
+      become: yes
+
+    - name: Ensure directory for app code exists
+      file:
+        path: /home/ubuntu/reddit
+        state: directory
+      tags: deploy-tag
+      become: yes
+
+    - name: Add the MongoDB 3.6 Repository GPG Key
+      ansible.builtin.apt_key:
+        url: "https://www.mongodb.org/static/pgp/server-3.6.asc"
+        state: present
+      tags: db-tag
+      become: yes
+
+    - name: Add the MongoDB 3.6 Repository
+      ansible.builtin.apt_repository:
+        repo: "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse"
+        state: present
+      tags: db-tag
+      become: yes
+
+    - name: Update the local package database
+      ansible.builtin.apt:
+        update_cache: yes
+      tags: db-tag
+      become: yes
+
+    - name: Install MongoDB
+      ansible.builtin.apt:
+        name: mongodb-org
+        state: present
+      tags: db-tag
+      become: yes
+
+    - name: Start and enable MongoDB service
+      ansible.builtin.service:
+        name: mongod
+        state: started
+        enabled: yes
+      tags: db-tag
+      become: yes
+
+    - name: Fetch the latest version of application code
+      git:
+        repo: 'https://github.com/express42/reddit.git'
+        dest: /home/ubuntu/reddit
+        version: monolith
+      tags: deploy-tag
+      notify: reload puma
+
+    - name: Bundle install
+      bundler:
+        state: present
+        chdir: /home/ubuntu/reddit
+      tags: deploy-tag
+      become: yes
+
+    - name: Change mongo config file
+      become: true
+      template:
+        src: templates/mongod.conf.j2
+        dest: /etc/mongod.conf
+        mode: 0644
+      tags: db-tag
+      notify: restart mongod
+
+    - name: Add config for DB connection
+      template:
+        src: templates/db_config.j2
+        dest: /home/ubuntu/db_config
+      become: yes
+      tags: db-tag
+
+    - name: Copy Puma service file
+      ansible.builtin.copy:
+        src: files/puma.service
+        dest: /etc/systemd/system/puma.service
+        owner: root
+        group: root
+        mode: '0644'
+      become: yes
+      tags: app-tag
+      notify: reload systemd
+
+    - name: Enable and start Puma service
+      ansible.builtin.service:
+        name: puma
+        enabled: yes
+        state: started
+      tags: app-tag
+      become: yes
+
+  handlers:
+    - name: restart mongod
+      become: true
+      service:
+        name: mongod
+        state: restarted
+
+    - name: reload puma
+      become: true
+      systemd:
+        name: puma
+
+    - name: reload systemd
+      ansible.builtin.command:
+        cmd: systemctl daemon-reload
+      become: yes
