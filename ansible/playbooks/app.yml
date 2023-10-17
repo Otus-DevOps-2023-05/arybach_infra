@@ -1,0 +1,9 @@
+- name: Configure App
+  hosts: app
+  become: true
+
+  vars:
+    db_host: {{ hostvars['dbserver']['ansible_internal_ip'] }}
+
+  roles:
+    - app

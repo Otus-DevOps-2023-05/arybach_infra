@@ -1,0 +1,3 @@
+# defaults file for app
+db_host: "{{ hostvars['dbserver']['ansible_internal_ip'] }}"
+env: local

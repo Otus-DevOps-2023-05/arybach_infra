@@ -1,0 +1,88 @@
+---
+- name: Install git
+  become: true
+  apt:
+    pkg:
+      - nano
+      - git
+      - policykit-1
+    state: latest
+    update_cache: true
+
+- name: Install Ruby and RubyGems
+  ansible.builtin.apt:
+    name:
+      - ruby-full
+      - ruby-bundler
+      - build-essential
+    state: present
+  tags: deploy-tag
+  become: yes
+
+- name: Install specified Bundler version
+  command: gem install bundler:1.17.2
+  tags: deploy-tag
+  become: yes
+
+- name: Reset SSH connection
+  meta: reset_connection
+
+- name: Ensure directory for app code exists
+  file:
+    path: "/home/{{ ansible_user }}/reddit"
+    state: directory
+  tags: deploy-tag
+  become: yes
+
+- name: Install dependencies for building Python
+  apt:
+    name:
+      - gcc
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - wget
+      - curl
+      - llvm
+      - libncurses5-dev
+      - xz-utils
+      - tk-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - libffi-dev
+      - liblzma-dev
+    state: present
+  become: yes
+
+- name: Download Python 3.6.15 source
+  ansible.builtin.get_url:
+    url: "https://www.python.org/ftp/python/3.6.15/Python-3.6.15.tgz"
+    dest: "/tmp/Python-3.6.15.tgz"
+
+- name: Extract Python source
+  ansible.builtin.unarchive:
+    src: "/tmp/Python-3.6.15.tgz"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Compile and install Python 3.6
+  command:
+    cmd: "{{ item }}"
+    chdir: "/tmp/Python-3.6.15"
+  loop:
+    - "./configure --enable-optimizations"
+    - "make"
+    - "make altinstall"
+  become: yes
+
+- name: Update the symbolic link for python3
+  command: ln -sf /usr/local/bin/python3.6 /usr/bin/python3
+  become: yes
+
+- name: Install pip for Python 3.6
+  shell:
+    cmd: "curl https://bootstrap.pypa.io/pip/3.6/get-pip.py | python3.6"
+  become: yes

@@ -3,7 +3,8 @@ terraform {
     endpoint   = "storage.yandexcloud.net"
     bucket     = "tumblebuns"
     key        = "terraform.tfstate"
-    access_key = "xxxxxxxxxxxxxxxx"
-    secret_key = "xxxxxxxxxxxxxxxxxxxxx"
   }
 }
+
+    # access_key = "xxxxxxxxxxxxxxx"
+    # secret_key = "xxxxxxxxxxxxxxxxxxxxx"

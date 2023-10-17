@@ -6,3 +6,5 @@ packer/variables.json
 *.tfvars
 .terraform/
 terraform/terraform-provider-yandex
+*.retry
+vault.key

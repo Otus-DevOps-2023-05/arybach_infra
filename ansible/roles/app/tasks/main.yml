@@ -1,0 +1,82 @@
+# tasks file for app
+- name: Show info about the env this host belongs to
+  debug:
+    msg: "This host is in {{ env }} environment!!!"
+
+- name: Ensure directory for app code exists
+  file:
+    path: /home/{{ ansible_user }}/reddit
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  tags: app-tag
+  become: yes
+
+- name: Fetch the latest version of application code
+  git:
+    repo: 'https://github.com/express42/reddit.git'
+    dest: /home/{{ ansible_user }}/reddit
+    version: microservices
+  tags: app-tag
+  notify: reload puma
+  become: yes
+  become_user: "{{ ansible_user }}"
+
+- name: Install specified python requirements for Python 3
+  ansible.builtin.pip:
+    requirements: /home/{{ ansible_user }}/reddit/post-py/requirements.txt
+    executable: pip3  # This ensures Python 3's pip is used
+  tags: app-tag
+  become: yes
+  become_user: "{{ ansible_user }}"
+
+- name: Add config for DB connection
+  template:
+    src: templates/db_config.j2
+    dest: /home/{{ ansible_user }}/db_config
+  become: yes
+  tags: app-tag
+
+# can't help but wonder - who chose to use different env vars for db host connections in post-py and comment, WHY?
+- name: Add COMMENT_DATABASE_HOST to .bashrc
+  lineinfile:
+    path: "/home/{{ ansible_user }}/.bashrc"
+    line: "export COMMENT_DATABASE_HOST={{ hostvars['dbserver']['ansible_internal_ip'] }}"
+    state: present
+  tags: app-tag
+  become_user: "{{ ansible_user }}"
+
+- name: Add POST_DATABASE_HOST to .bashrc
+  lineinfile:
+    path: "/home/{{ ansible_user }}/.bashrc"
+    line: "export POST_DATABASE_HOST={{ hostvars['dbserver']['ansible_internal_ip'] }}"
+    state: present
+  tags: app-tag
+  become_user: "{{ ansible_user }}"
+
+- name: Bundle install for the UI service
+  bundler:
+    state: present
+    chdir: /home/{{ ansible_user }}/reddit/ui  # Adjusted path to point to the ui directory
+  tags: app-tag
+  become_user: "{{ ansible_user }}"
+
+- name: Copy Puma service file
+  ansible.builtin.copy:
+    src: files/puma.service
+    dest: /etc/systemd/system/puma.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: app-tag
+  notify: reload puma
+
+- name: Enable and start Puma service
+  ansible.builtin.service:
+    name: puma
+    enabled: yes
+    state: started
+  tags: app-tag
+  become: yes

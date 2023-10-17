@@ -1,4 +1,5 @@
 ---
+# monolith deploy playbook
 - name: Configure hosts & deploy application
   hosts: appserver
   vars:

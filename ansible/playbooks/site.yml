@@ -1,0 +1,17 @@
+---
+- name: Apt install packages
+  hosts: appserver
+  serial: 1
+  roles:
+    - aptinstall
+
+# the order is important here
+- name: Configure DB
+  hosts: dbserver
+  roles:
+    - db
+
+- name: Configure App & Deploy
+  hosts: appserver
+  roles:
+    - app
