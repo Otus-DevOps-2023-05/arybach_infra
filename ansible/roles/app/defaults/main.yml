@@ -1,3 +1,5 @@
 # defaults file for app
-db_host: "{{ hostvars['dbserver']['ansible_internal_ip'] }}"
 env: local
+db_host: dbserver
+deploy_user: ubuntu
+pyenv_root: "/home/{{ deploy_user }}/.pyenv"

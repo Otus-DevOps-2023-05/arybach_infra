@@ -7,6 +7,12 @@
     daemon_reload: yes
   become: yes
 
+- name: restart puma
+  systemd:
+    name: puma
+    state: restarted
+  become: yes
+
 - name: reload systemd
   ansible.builtin.command:
     cmd: systemctl daemon-reload

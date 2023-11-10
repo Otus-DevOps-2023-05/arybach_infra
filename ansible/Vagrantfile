@@ -1,0 +1,78 @@
+ENV['PATH'] = "/home/groot/miniconda/bin/:#{ENV['PATH']}"
+
+Vagrant.configure("2") do |config|
+  # Define the box to use for both VMs globally
+  config.vm.box = "ubuntu/xenial64"
+
+  # Provisioning script to enable passwordless sudo and set a password for ubuntu user
+  $setup_script = <<-SCRIPT
+    #!/bin/bash
+    # Set password for ubuntu user
+    echo 'ubuntu:YOUR_PASSWORD' | sudo chpasswd
+    # Add ubuntu user to sudoers with no password prompt
+    echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/ubuntu
+    # Set correct permissions on the sudoers file
+    sudo chmod 0440 /etc/sudoers.d/ubuntu
+    # Output the contents for debugging
+    echo 'Contents of /etc/sudoers.d/ubuntu:'
+    cat /etc/sudoers.d/ubuntu
+    # Test sudo access
+    echo 'Testing sudo access for ubuntu user:'
+    sudo -u ubuntu sudo -l
+  SCRIPT
+
+  # Define the dbserver VM
+  config.vm.define "dbserver" do |db|
+    db.vm.hostname = "dbserver"
+    # Update the IP to match the allowed range
+    db.vm.network "private_network", ip: "192.168.56.10"
+
+    # Run the provisioning script to enable passwordless sudo
+    db.vm.provision "shell", inline: $setup_script
+
+    # Ansible provider
+    db.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbooks/site.yml"
+      ansible.groups = {
+        "db" => ["dbserver"],
+        "db:vars" => {"mongo_bind_ip" => "0.0.0.0"}
+    }
+      ansible.extra_vars = {
+        "db_host" => "192.168.56.10",
+        "deploy_user" => "ubuntu"
+      }
+      ansible.compatibility_mode = "2.0" # Here is where you set the compatibility mode
+    end
+
+    db.vm.provider "virtualbox" do |v|
+      v.memory = 2048
+    end
+  end
+
+  # Define the appserver VM
+  config.vm.define "appserver" do |app|
+    app.vm.hostname = "appserver"
+    # Update the IP to match the allowed range
+    app.vm.network "private_network", ip: "192.168.56.20"
+
+    # Run the provisioning script to enable passwordless sudo
+    app.vm.provision "shell", inline: $setup_script
+
+    # Ansible provider
+    app.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbooks/site.yml"
+      ansible.groups = {
+        "app" => ["appserver"]
+      }
+      ansible.extra_vars = {
+        "db_host" => "192.168.56.10",
+        "deploy_user" => "ubuntu"
+      }
+      ansible.compatibility_mode = "2.0" # Again set the compatibility mode here
+    end
+
+    app.vm.provider "virtualbox" do |v|
+      v.memory = 8192
+    end
+  end
+end

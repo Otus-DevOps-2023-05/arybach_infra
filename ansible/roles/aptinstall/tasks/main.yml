@@ -29,7 +29,7 @@
 
 - name: Ensure directory for app code exists
   file:
-    path: "/home/{{ ansible_user }}/reddit"
+    path: "/home/{{ deploy_user }}/reddit"
     state: directory
   tags: deploy-tag
   become: yes

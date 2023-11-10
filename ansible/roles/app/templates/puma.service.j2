@@ -1,0 +1,24 @@
+[Unit]
+Description=Puma HTTP Server
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/home//{{ deploy_user }}/db_config
+User=/{{ deploy_user }}
+WorkingDirectory=/home//{{ deploy_user }}/reddit/ui
+ExecStart=/bin/bash -lc 'puma'
+Restart=always
+
+# Env vars
+Environment=POST_DATABASE_HOST={{ db_host }}
+Environment=POST_DATABASE=posts
+Environment=POST_DATABASE_PORT=27017
+Environment=COMMENT_DATABASE_HOST={{ db_host }}
+Environment=COMMENT_DATABASE_PORT=27017
+Environment=COMMENT_DATABASE=comments
+Environment=POST_SERVICE_HOST=localhost
+Environment=POST_SERVICE_PORT=5000
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,83 @@
+- name: Deploy App with pyenv
+  hosts: appserver
+  vars:
+    deploy_user: ubuntu
+    python_version: "3.6.15"  # Specify the Python version you want to use
+    pyenv_root: "/home/{{ deploy_user }}/.pyenv"
+  become: true
+
+  tasks:
+    - name: Ensure correct ownership of the app directory and its contents
+      ansible.builtin.file:
+        path: "/home/{{ deploy_user }}/reddit"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0755"
+        recurse: yes
+      become: true
+      become_user: root
+
+    - name: Fetch the latest version of application code
+      ansible.builtin.git:
+        # repo: 'https://github.com/express42/reddit.git'
+        repo: 'https://github.com/arybach/reddit.git'
+        dest: "/home/{{ deploy_user }}/reddit"
+        version: microservices
+        force: yes
+      become_user: "{{ deploy_user }}"
+
+    # # This is to overwrite post service
+    # - name: Copy Post application files
+    #   ansible.builtin.copy:
+    #     src: "/media/groot/data/arybach_infra/ansible/roles/app/files/{{ item.src }}"
+    #     dest: "/home/{{ deploy_user }}/reddit/post-py/{{ item.dest }}"
+    #     owner: "{{ deploy_user }}"
+    #     group: "{{ deploy_user }}"
+    #     mode: '0755'
+    #     force: yes
+    #   loop:
+    #     - { src: 'post_app.py', dest: 'post_app.py' }
+    #     - { src: 'helpers.py', dest: 'helpers.py' }
+    #     - { src: 'VERSION', dest: 'VERSION' }
+    #     - { src: 'requirements.txt', dest: 'requirements.txt' }
+    #   loop_control:
+    #     label: "{{ item.src }}"
+    #   tags: app-tag
+    #   become_user: "{{ deploy_user }}"
+
+    - name: Create a virtual environment using pyenv's Python
+      become: yes
+      become_user: "{{ deploy_user }}"
+      command: "{{ pyenv_root }}/bin/pyenv exec python3 -m venv /home/{{ deploy_user }}/reddit/venv"
+      environment:
+        PYENV_ROOT: "/home/{{ deploy_user }}/.pyenv"
+        PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+    - name: Install Python packages from requirements.txt using pyenv's pip
+      become: yes
+      become_user: "{{ deploy_user }}"
+      command: "/home/{{ deploy_user }}/reddit/venv/bin/pip install -r /home/{{ deploy_user }}/reddit/post-py/requirements.txt"
+      environment:
+        PYENV_ROOT: "/home/{{ deploy_user }}/.pyenv"
+        PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:{{ ansible_env.PATH }}"
+      register: pip_install
+      failed_when: pip_install.rc != 0
+
+    - name: Bundle install for the UI service
+      become: yes
+      become_user: "{{ deploy_user }}"
+      command: bundle install
+      args:
+        chdir: "/home/{{ deploy_user }}/reddit/ui"
+      environment:
+        PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:/usr/local/bin:{{ ansible_env.PATH }}"
+
+    - name: Bundle install for Comment service
+      become: yes
+      become_user: "{{ deploy_user }}"
+      command: bundle install
+      args:
+        chdir: "/home/{{ deploy_user }}/reddit/comment"
+      environment:
+        PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:/usr/local/bin:{{ ansible_env.PATH }}"

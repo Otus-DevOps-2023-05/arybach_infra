@@ -1,0 +1,33 @@
+- name: Configure Puma
+  hosts: appserver
+  vars:
+    db_host: localhost
+  tasks:
+
+  # - name: Add config for Puma service
+  #   template:
+  #     src: /media/groot/data/arybach_infra/ansible/roles/app/templates/puma.service.j2
+  #     dest: "/media/groot/data/arybach_infra/ansible/roles/app/files/puma.service"
+  #   delegate_to: localhost  # This will run the task on your local machine
+  #   run_once: true  # This will ensure the task is not run for every host in the inventory
+  #   check_mode: false  # This will ensure the file is actually created even when Ansible is run in check mode
+  #   tags:
+  #     - app-tag
+
+  - name: Copy Puma service file
+    ansible.builtin.copy:
+      src: /media/groot/data/arybach_infra/ansible/roles/app/files/puma.service
+      dest: /etc/systemd/system/puma.service
+      owner: root
+      group: root
+      mode: '0644'
+    tags: puma
+    become: yes
+
+  - name: Enable Puma service
+    ansible.builtin.service:
+      name: puma
+      enabled: yes
+      state: stopped
+    tags: puma
+    become: yes
