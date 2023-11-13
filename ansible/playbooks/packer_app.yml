@@ -1,0 +1,8 @@
+---
+- name: Packer App Provisioning
+  hosts: appserver
+  become: true
+  tasks:
+    - name: Include App role
+      include_role:
+        name: app

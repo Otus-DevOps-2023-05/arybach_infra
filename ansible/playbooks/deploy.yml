@@ -17,6 +17,7 @@
         recurse: yes
       become: true
       become_user: root
+      tags: app
 
     - name: Fetch the latest version of application code
       ansible.builtin.git:
@@ -26,6 +27,7 @@
         version: microservices
         force: yes
       become_user: "{{ deploy_user }}"
+      tags: app
 
     - name: Create a virtual environment using pyenv's Python
       become: yes
@@ -34,6 +36,7 @@
       environment:
         PYENV_ROOT: "/home/{{ deploy_user }}/.pyenv"
         PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:{{ ansible_env.PATH }}"
+      tags: app
 
     - name: Install Python packages from requirements.txt using pyenv's pip
       become: yes
@@ -44,6 +47,7 @@
         PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:{{ ansible_env.PATH }}"
       register: pip_install
       failed_when: pip_install.rc != 0
+      tags: app
 
     - name: Bundle install for the UI service
       become: yes
@@ -53,6 +57,7 @@
         chdir: "/home/{{ deploy_user }}/reddit/ui"
       environment:
         PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:/usr/local/bin:{{ ansible_env.PATH }}"
+      tags: app
 
     - name: Bundle install for Comment service
       become: yes
@@ -62,3 +67,4 @@
         chdir: "/home/{{ deploy_user }}/reddit/comment"
       environment:
         PATH: "/home/{{ deploy_user }}/.pyenv/bin:/home/{{ deploy_user }}/.pyenv/shims:/usr/local/bin:{{ ansible_env.PATH }}"
+      tags: app

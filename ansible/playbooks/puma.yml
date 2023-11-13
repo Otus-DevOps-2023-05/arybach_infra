@@ -13,6 +13,7 @@
         mode: '0644'
       become: true
       notify: Reload and restart Puma service
+      tags: app
 
     - name: Enable Puma service
       ansible.builtin.service:
@@ -21,6 +22,7 @@
         state: stopped
       become: true
       notify: Reload and restart Puma service
+      tags: app
 
   handlers:
     - name: Reload and restart Puma service
@@ -30,3 +32,4 @@
         daemon_reload: yes
         enabled: yes
       become: true
+      tags: app

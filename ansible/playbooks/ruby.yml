@@ -15,7 +15,7 @@
           - python3-apt
         state: latest
         update_cache: true
-      tags: ruby
+      tags: app
 
     - name: Install Ruby and RubyGems
       become: true
@@ -25,7 +25,7 @@
           - ruby-bundler
           - build-essential
         state: present
-      tags: ruby
+      tags: app
 
     - name: Check Bundler version
       command: gem list bundler -i -v 1.17.2
@@ -33,12 +33,13 @@
       failed_when: bundler_installed.rc not in [0, 1]
       changed_when: bundler_installed.rc == 1
       become: true
+      tags: app
 
     - name: Install Bundler version
       become: true
       command: gem install bundler:1.17.2
       when: bundler_installed.rc == 1
-      tags: ruby
+      tags: app
 
     # this is usefull only for debugging as source command only works on a task level, not on a host level
     - name: Add Bundler executable directory to PATH in .bashrc
@@ -49,3 +50,4 @@
         line: 'export PATH="/usr/local/bin:$PATH"'
         state: present
         create: no
+      tags: app

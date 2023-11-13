@@ -2,6 +2,7 @@
   - name: Show info about the env this host belongs to
     debug:
       msg: "This host is in {{ env }} environment!!!"
+    tags: app
 
   - name: Copy Flask service file to systemd
     ansible.builtin.template:
@@ -10,11 +11,13 @@
       owner: root
       group: root
       mode: '0644'
+    tags: app
     become: yes
 
   - name: Reload systemd to recognize Flask service
     ansible.builtin.systemd:
       daemon_reload: yes
+    tags: app
     become: yes
 
   - name: Enable and start Flask service
@@ -22,6 +25,7 @@
       name: flask
       enabled: yes
       state: started
+    tags: app
     become: yes
 
   # - name: Start Puma service

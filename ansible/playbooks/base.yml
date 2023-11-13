@@ -27,6 +27,7 @@
           - libxmlsec1-dev
         state: latest
         update_cache: true
+      tags: app
 
     - name: Install pyenv
       git:
@@ -34,6 +35,7 @@
         dest: "/home/{{ deploy_user }}/.pyenv"
         version: master
       become_user: "{{ deploy_user }}"
+      tags: app
 
     - name: Set environment variables for pyenv
       lineinfile:
@@ -45,6 +47,7 @@
         - 'eval "$(pyenv init --path)"'
         - 'eval "$(pyenv init -)"'
       become_user: "{{ deploy_user }}"
+      tags: app
 
     - name: Install Python version using pyenv
       shell: |
@@ -54,6 +57,7 @@
       args:
         executable: /bin/bash
       become_user: "{{ deploy_user }}"
+      tags: app
 
     - name: Ensure pip is installed for the selected Python version
       shell: |
@@ -63,3 +67,4 @@
       args:
         executable: /bin/bash
       become_user: "{{ deploy_user }}"
+      tags: app
