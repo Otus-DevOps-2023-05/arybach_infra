@@ -4,10 +4,11 @@ After=network.target
 
 [Service]
 Type=simple
-EnvironmentFile=/home//{{ deploy_user }}/db_config
-User=/{{ deploy_user }}
-WorkingDirectory=/home//{{ deploy_user }}/reddit/ui
+#EnvironmentFile=/home/{{ deploy_user }}/db_config
+User={{ deploy_user }}
+WorkingDirectory=/home/{{ deploy_user }}/reddit/ui
 ExecStart=/bin/bash -lc 'puma'
+RestartSec=20
 Restart=always
 
 # Env vars
@@ -17,7 +18,8 @@ Environment=POST_DATABASE_PORT=27017
 Environment=COMMENT_DATABASE_HOST={{ db_host }}
 Environment=COMMENT_DATABASE_PORT=27017
 Environment=COMMENT_DATABASE=comments
-Environment=POST_SERVICE_HOST=localhost
+Environment=COMMENT_SERVICE_HOST={{ app_host }}
+Environment=POST_SERVICE_HOST={{ app_host }}
 Environment=POST_SERVICE_PORT=5000
 
 [Install]

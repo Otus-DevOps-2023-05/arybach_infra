@@ -27,25 +27,6 @@
         force: yes
       become_user: "{{ deploy_user }}"
 
-    # # This is to overwrite post service
-    # - name: Copy Post application files
-    #   ansible.builtin.copy:
-    #     src: "/media/groot/data/arybach_infra/ansible/roles/app/files/{{ item.src }}"
-    #     dest: "/home/{{ deploy_user }}/reddit/post-py/{{ item.dest }}"
-    #     owner: "{{ deploy_user }}"
-    #     group: "{{ deploy_user }}"
-    #     mode: '0755'
-    #     force: yes
-    #   loop:
-    #     - { src: 'post_app.py', dest: 'post_app.py' }
-    #     - { src: 'helpers.py', dest: 'helpers.py' }
-    #     - { src: 'VERSION', dest: 'VERSION' }
-    #     - { src: 'requirements.txt', dest: 'requirements.txt' }
-    #   loop_control:
-    #     label: "{{ item.src }}"
-    #   tags: app-tag
-    #   become_user: "{{ deploy_user }}"
-
     - name: Create a virtual environment using pyenv's Python
       become: yes
       become_user: "{{ deploy_user }}"

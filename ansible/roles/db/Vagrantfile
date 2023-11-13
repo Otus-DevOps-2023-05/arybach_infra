@@ -1,0 +1,22 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+
+  # Provisioning script to set a password for ubuntu user and enable passwordless sudo
+  $setup_script = <<-SCRIPT
+  #!/bin/bash
+  echo 'ubuntu:YOUR_PASSWORD' | sudo chpasswd
+  echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/ubuntu
+  sudo chmod 0440 /etc/sudoers.d/ubuntu
+  SCRIPT
+
+  # Define the testserver VM
+  config.vm.define "testserver" do |db|
+      db.vm.hostname = "testserver"
+      db.vm.network "private_network", ip: "192.168.56.30"
+      db.vm.provision "shell", inline: $setup_script
+
+      db.vm.provider "virtualbox" do |v|
+          v.memory = 2048
+      end
+  end
+end

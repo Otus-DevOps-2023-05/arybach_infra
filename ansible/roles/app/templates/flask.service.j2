@@ -1,0 +1,16 @@
+[Unit]
+Description=Flask Application
+
+[Service]
+Type=simple
+User={{ deploy_user }}
+WorkingDirectory=/home/{{ deploy_user }}/reddit/post-py
+ExecStart=/home/{{ deploy_user }}/reddit/venv/bin/python /home/{{ deploy_user }}/reddit/post-py/post_app.py
+Restart=always
+#Environment=POST_DATABASE_HOST={{ db_host }}
+Environment=POST_DATABASE_HOST={{ db_host }}
+Environment=POST_DATABASE=posts
+Environment=POST_DATABASE_PORT=27017
+
+[Install]
+WantedBy=multi-user.target

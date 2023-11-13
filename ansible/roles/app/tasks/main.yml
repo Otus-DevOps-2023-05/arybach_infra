@@ -4,8 +4,8 @@
       msg: "This host is in {{ env }} environment!!!"
 
   - name: Copy Flask service file to systemd
-    ansible.builtin.copy:
-      src: /media/groot/data/arybach_infra/ansible/roles/app/files/flask.service
+    ansible.builtin.template:
+      src: /media/groot/data/arybach_infra/ansible/roles/app/templates/flask.service.j2
       dest: /etc/systemd/system/flask.service
       owner: root
       group: root
@@ -24,16 +24,7 @@
       state: started
     become: yes
 
-  # Include Puma tasks only if it's a separate application/service
-  - name: Check if Puma service is running
-    command: systemctl is-active puma
-    register: puma_status
-    changed_when: false
-    ignore_errors: true
-    check_mode: false
-    become: yes
-
-  - name: Start Puma service if it's stopped
-    command: systemctl start puma
-    when: puma_status.stdout != "active"
-    become: yes
+  # - name: Start Puma service
+  #   command: systemctl start puma
+  #   tags: puma
+  #   become: yes

@@ -2,7 +2,7 @@
 - name: Install ruby and rubygems and required packages
   hosts: appserver
   vars:
-    deploy_user: ubuntu  # Define your deploy user variable at the playbook level if not already done
+    deploy_user: ubuntu
 
   tasks:
     - name: Install ancillary packages
@@ -40,13 +40,12 @@
       when: bundler_installed.rc == 1
       tags: ruby
 
-    # this is usefull only for debugging as source command only works on a task level, not a host level
-    # Ensure bundler is in the PATH for future tasks for the deploy_user
+    # this is usefull only for debugging as source command only works on a task level, not on a host level
     - name: Add Bundler executable directory to PATH in .bashrc
       become: true
       become_user: "{{ deploy_user }}"
       lineinfile:
         path: "/home/{{ deploy_user }}/.bashrc"
-        line: 'export PATH="/usr/local/bin:$PATH"'  # assuming bundler is in /usr/local/bin
+        line: 'export PATH="/usr/local/bin:$PATH"'
         state: present
         create: no

@@ -1,0 +1,11 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    # Add a task to destroy VMs using custom Vagrantfile
+    - name: Destroy VMs using custom Vagrantfile
+      command: vagrant destroy -f
+      args:
+        chdir: /media/groot/data/arybach_infra/ansible/roles/db/
