@@ -1,0 +1,53 @@
+---
+- name: Install ruby and rubygems and required packages
+  hosts: appserver
+  vars:
+    deploy_user: ubuntu
+
+  tasks:
+    - name: Install ancillary packages
+      become: true
+      ansible.builtin.apt:
+        name:
+          - nano
+          - git
+          - policykit-1
+          - python3-apt
+        state: latest
+        update_cache: true
+      tags: app
+
+    - name: Install Ruby and RubyGems
+      become: true
+      ansible.builtin.apt:
+        name:
+          - ruby-full
+          - ruby-bundler
+          - build-essential
+        state: present
+      tags: app
+
+    - name: Check Bundler version
+      command: gem list bundler -i -v 1.17.2
+      register: bundler_installed
+      failed_when: bundler_installed.rc not in [0, 1]
+      changed_when: bundler_installed.rc == 1
+      become: true
+      tags: app
+
+    - name: Install Bundler version
+      become: true
+      command: gem install bundler:1.17.2
+      when: bundler_installed.rc == 1
+      tags: app
+
+    # this is usefull only for debugging as source command only works on a task level, not on a host level
+    - name: Add Bundler executable directory to PATH in .bashrc
+      become: true
+      become_user: "{{ deploy_user }}"
+      lineinfile:
+        path: "/home/{{ deploy_user }}/.bashrc"
+        line: 'export PATH="/usr/local/bin:$PATH"'
+        state: present
+        create: no
+      tags: app

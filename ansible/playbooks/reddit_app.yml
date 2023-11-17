@@ -1,4 +1,5 @@
 ---
+# monolith deploy playbook
 - name: Configure hosts & deploy application
   hosts: appserver
   vars:
@@ -69,11 +70,22 @@
       tags: db-tag
       become: yes
 
+    - name: Ensure correct ownership of the app directory
+      file:
+        path: "/home/{{ deploy_user }}/reddit"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: '0755'
+        recurse: yes
+    become: yes
+
     - name: Fetch the latest version of application code
       git:
         repo: 'https://github.com/express42/reddit.git'
         dest: /home/ubuntu/reddit
         version: monolith
+        force: yes
       tags: deploy-tag
       notify: reload puma
 

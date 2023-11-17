@@ -1,0 +1,9 @@
+- name: Configure App
+  hosts: appserver
+  become: true
+
+  vars:
+    db_host: localhost
+
+  roles:
+    - app

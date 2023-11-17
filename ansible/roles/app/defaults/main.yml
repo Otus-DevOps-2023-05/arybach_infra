@@ -1,0 +1,5 @@
+# defaults file for app
+env: local
+db_host: dbserver
+deploy_user: ubuntu
+pyenv_root: "/home/{{ deploy_user }}/.pyenv"

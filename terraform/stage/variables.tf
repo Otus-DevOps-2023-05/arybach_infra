@@ -26,10 +26,6 @@ variable "image_id" {
   description = "Disk image"
 }
 
-variable "subnet_id" {
-  description = "Subnet"
-}
-
 variable "yc_token" {
   description = "YC token"
 }

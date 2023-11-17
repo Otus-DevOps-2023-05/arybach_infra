@@ -3,11 +3,16 @@ variable public_key_path {
   description = "Path to the public key used for ssh access"
 }
 
-variable subnet_id {
-  description = "Subnet"
-}
-
 variable db_disk_image {
   description = "Disk image for reddit db"
   default = "reddit-db-base"
 }
+
+# variable subnet_id {
+#   description = "Subnet"
+# }
+
+# variable "security_group_id" {
+#   description = "The ID of the security group to attach to the instance"
+#   type        = string
+# }

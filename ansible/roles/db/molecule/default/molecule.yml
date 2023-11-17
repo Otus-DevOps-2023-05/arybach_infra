@@ -1,0 +1,43 @@
+---
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+
+platforms:
+  - name: testserver
+    box: ubuntu/xenial64
+    provider_raw_config_args:
+      - "vm.hostname = 'testserver'"
+      - "vm.network 'private_network', ip: '192.168.56.30'"
+      - "vm.provider 'virtualbox' do |v| v.memory = 2048; v.cpus = 2 end"
+    provisioner_raw_config_args:
+      - "ansible.compatibility_mode = '2.0'"
+      - "ansible.groups = { 'db' => ['testserver'] }"
+      - "ansible.extra_vars = { 'mongo_bind_ip': '0.0.0.0', 'ansible_python_interpreter': '/usr/bin/python3' }"
+    interfaces:
+      - auto_config: true
+        network_name: private_network
+        ip: "192.168.56.30"
+    ssh:
+      user: "vagrant"
+      port: 22
+      private_key_path: /media/groot/data/arybach_infra/ansible/roles/db/.vagrant/machines/testserver/virtualbox/private_key
+    config_options:
+      ssh.keep_alive: yes
+      ssh.remote_user: "'vagrant'"
+
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      testserver:
+        ansible_host: "192.168.56.30"
+        ansible_user: "vagrant"
+        ansible_port: 22
+        ansible_ssh_private_key_file: "/media/groot/data/arybach_infra/ansible/roles/db/.vagrant/machines/testserver/virtualbox/private_key"
+
+lint: |
+  set -e
+  yamllint .
+  ansible-lint

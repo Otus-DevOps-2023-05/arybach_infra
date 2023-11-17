@@ -1,0 +1,8 @@
+---
+- name: Packer DB Provisioning
+  hosts: dbserver
+  become: true
+  tasks:
+    - name: Include db role
+      include_role:
+        name: db

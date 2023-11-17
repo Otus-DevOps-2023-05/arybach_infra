@@ -1,0 +1,32 @@
+---
+- import_playbook: ruby.yml
+- import_playbook: base.yml
+- import_playbook: db.yml
+- import_playbook: puma.yml
+- import_playbook: deploy.yml
+- import_playbook: app.yml
+- import_playbook: nginx.yml
+
+# Tasks for configuring the database
+- name: Configure DB
+  hosts: dbserver
+  roles:
+    - db
+
+# Tasks for configuring the app and deploying it
+- name: Configure App & Deploy
+  hosts: appserver
+  roles:
+    - app
+  vars:
+    env: local
+    deploy_user: ubuntu
+
+# Show info about the env this host belongs to
+- name: Show environment info
+  hosts: appserver
+  vars:
+    env: local
+  tasks:
+    - debug:
+        msg: "This host is in {{ env }} environment!!!"

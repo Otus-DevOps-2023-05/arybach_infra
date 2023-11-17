@@ -1,0 +1,34 @@
+  # tasks file for app
+  - name: Show info about the env this host belongs to
+    debug:
+      msg: "This host is in {{ env }} environment!!!"
+    tags: app
+
+  - name: Copy Flask service file to systemd
+    ansible.builtin.template:
+      src: /media/groot/data/arybach_infra/ansible/roles/app/templates/flask.service.j2
+      dest: /etc/systemd/system/flask.service
+      owner: root
+      group: root
+      mode: '0644'
+    tags: app
+    become: yes
+
+  - name: Reload systemd to recognize Flask service
+    ansible.builtin.systemd:
+      daemon_reload: yes
+    tags: app
+    become: yes
+
+  - name: Enable and start Flask service
+    ansible.builtin.systemd:
+      name: flask
+      enabled: yes
+      state: started
+    tags: app
+    become: yes
+
+  # - name: Start Puma service
+  #   command: systemctl start puma
+  #   tags: puma
+  #   become: yes

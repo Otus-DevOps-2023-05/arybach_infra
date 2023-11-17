@@ -1,0 +1,12 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+
+    # Add a task to use custom Vagrantfile to bring up VMs
+    - name: Start VMs using custom Vagrantfile
+      command: vagrant up
+      args:
+        chdir: /media/groot/data/arybach_infra/ansible/roles/db/

@@ -1,0 +1,35 @@
+- name: Configure Puma
+  hosts: appserver
+  vars:
+    db_host: localhost
+
+  tasks:
+    - name: Create Puma service file from template
+      ansible.builtin.template:
+        src: /media/groot/data/arybach_infra/ansible/roles/app/templates/puma.service.j2
+        dest: /etc/systemd/system/puma.service
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+      notify: Reload and restart Puma service
+      tags: app
+
+    - name: Enable Puma service
+      ansible.builtin.service:
+        name: puma
+        enabled: yes
+        state: stopped
+      become: true
+      notify: Reload and restart Puma service
+      tags: app
+
+  handlers:
+    - name: Reload and restart Puma service
+      ansible.builtin.systemd:
+        name: puma
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+      become: true
+      tags: app

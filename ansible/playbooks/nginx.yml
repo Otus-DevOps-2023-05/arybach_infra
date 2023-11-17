@@ -1,0 +1,38 @@
+---
+- hosts: [appserver]
+  tasks:
+    - name: Ensure python3-apt is installed using shell
+      shell: apt-get update && apt-get install -y python3-apt
+      become: yes
+
+    - name: Install NGINX using shell
+      shell: apt-get install -y nginx
+      become: yes
+
+    - name: Ensure NGINX sites-available directory exists
+      file:
+        path: /etc/nginx/sites-available
+        state: directory
+        mode: '0755'
+      become: yes
+
+    - name: Set up NGINX to proxy app
+      template:
+        src: /media/groot/data/arybach_infra/ansible/roles/app/templates/nginx_proxy.j2
+        dest: /etc/nginx/sites-available/app_proxy
+      become: yes
+      notify: Reload NGINX
+
+    - name: Enable the NGINX configuration
+      file:
+        src: /etc/nginx/sites-available/app_proxy
+        dest: /etc/nginx/sites-enabled/app_proxy
+        state: link
+      become: yes
+
+  handlers:
+    - name: Reload NGINX
+      service:
+        name: nginx
+        state: reloaded
+      become: yes
